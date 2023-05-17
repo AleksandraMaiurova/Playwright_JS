@@ -17,16 +17,6 @@ test.describe("API", () => {
     await browser.close();
   });
 
-  test.beforeEach(async () => {
-    page = await browser.newPage();
-    await page.goto("https://k-ampus.dev/api/v1/login");
-  });
-
-  test.afterEach(async () => {
-    await page.close();
-  });
-
-
   test('request status', async ({ request }) => {
     const response = await request.post('https://k-ampus.dev/api/v1/login', {
         data: {
@@ -35,8 +25,23 @@ test.describe("API", () => {
         }
 })
     expect(response.status()).toEqual(StatusCodes.OK)
-    expect(await response.json()['accessToken']).not.toBeNull();
+    const responseBody = JSON.parse(await response.text())
+    expect(responseBody.accessToken).not.toBeNull();
   })
 
+  test.before(async ({ request }) => {
+    browser = await chromium.launch();
+  });
+})
+
+test('request status competence', async ({ request}) => {
+  const response = await request.get('https://k-ampus.dev/api/v1/competence', {
+      headers: {
+        "Authorization": `${authToken}`,
+      }    
+})  
+      expect(response.status()).toEqual(StatusCodes.OK)
 
 })
+
+
